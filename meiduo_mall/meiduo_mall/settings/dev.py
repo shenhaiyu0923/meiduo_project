@@ -107,6 +107,7 @@ DATABASES = {
         'NAME': 'meiduo' # 数据库名字
     },
 }
+
 #配置redis数据库
 CACHES = {
     "default": { # 默认

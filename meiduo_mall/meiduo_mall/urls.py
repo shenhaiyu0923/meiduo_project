@@ -21,4 +21,5 @@ urlpatterns = [
 
     # users
     url(r'^', include('users.urls', namespace='users')),
+    url(r'^', include('contents.urls', namespace='contents')),
 ]

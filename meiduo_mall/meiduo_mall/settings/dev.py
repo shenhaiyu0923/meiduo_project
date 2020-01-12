@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     # 'meiduo_mall.apps.users', # 用户模块
     'users', # 用户模块
+    'contents'#首页广告模块
 ]
 
 MIDDLEWARE = [

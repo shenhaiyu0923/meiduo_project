@@ -5,9 +5,24 @@ import re
 from django.db import DatabaseError
 from django.urls import reverse
 from django.contrib.auth import login
-
+from meiduo_mall.utils.response_code import RETCODE
 from users.models import User
 # Create your views here.
+
+class UsernameCountView(View):
+    """判断用户名是否重复注册"""
+
+    def get(self, request, username):
+        """
+        :param username: 用户名
+        :return: JSON
+        """
+        # 实现主体业务逻辑：使用username查询对应的记录的条数(filter返回的是满足条件的结果集)
+        count = User.objects.filter(username=username).count()
+        # 响应结果
+        print(count)
+        return http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'count': count})
+
 
 class RegisterView(View):
     """用户注册"""
@@ -48,6 +63,9 @@ class RegisterView(View):
             user = User.objects.create_user(username=username, password=password, mobile=mobile)
         except DatabaseError:
             return render(request, 'register.html', {'register_errmsg':'注册失败'})
+
+        #状态保持
+        #login(request, user)
 
         # 响应结果：重定向到广告首页
         return redirect(reverse('contents:index'))

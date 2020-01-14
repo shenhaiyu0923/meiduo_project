@@ -13,6 +13,7 @@ let vm = new Vue({
         allow: '',
         image_code_url: '',
         uuid: '',
+        image_code:'',
 
         // v-show
         error_name: false,
@@ -20,10 +21,12 @@ let vm = new Vue({
         error_password2: false,
         error_mobile: false,
         error_allow: false,
+        error_image_code:false,
 
         // error_message
         error_name_message: '',
         error_mobile_message: '',
+        error_image_code_message:'',
     },
     mounted() { // 页面加载完会被调用的
         // 生成图形验证码
@@ -98,6 +101,16 @@ let vm = new Vue({
                 this.error_mobile = true;
             }
         },
+        //校验图片验证码
+        check_image_code(){
+          if (this.image_code.length !=4){
+              this.error_image_code_message='请输入正确的验证码';
+              this.error_image_code = true;
+          }  else {
+              this.error_image_code = false;
+          }
+        },
+
         // 校验是否勾选协议
         check_allow() {
             if (!this.allow) {

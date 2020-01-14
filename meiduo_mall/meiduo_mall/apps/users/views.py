@@ -5,7 +5,7 @@ import re
 from django.db import DatabaseError
 from django.urls import reverse
 from django.contrib.auth import login
-from meiduo_mall.utils.response_code import RETCODE
+from response_code import RETCODE
 from users.models import User
 # Create your views here.
 
@@ -20,7 +20,21 @@ class UsernameCountView(View):
         # 实现主体业务逻辑：使用username查询对应的记录的条数(filter返回的是满足条件的结果集)
         count = User.objects.filter(username=username).count()
         # 响应结果
-        print(count)
+        #print(count) #测试
+        return http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'count': count})
+
+class MobileCountView(View):
+    """判断手机号是否重复注册"""
+
+    def get(self, request, mobile):
+        """
+        :param request: 请求对象
+        :param mobile: 手机号
+        :return: JSON
+        """
+
+        count = User.objects.filter(mobile=mobile).count()
+        print(count)  # 测试
         return http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'count': count})
 
 

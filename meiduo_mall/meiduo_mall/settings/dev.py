@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     # 'meiduo_mall.apps.users', # 用户模块
     'users', # 用户模块
     'contents'#首页广告模块
+  #  'verifications'#验证码模块，因为没有生成表单，不在这里注册也行
 ]
 
 MIDDLEWARE = [

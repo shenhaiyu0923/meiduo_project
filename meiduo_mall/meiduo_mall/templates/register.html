@@ -45,12 +45,12 @@
 							<input type="text" v-model="mobile" @blur="check_mobile" name="mobile" id="phone">
 							<span class="error_tip" v-show="error_mobile">[[ error_mobile_message ]]</span>
 						</li>
-						<li>
-							<label>图形验证码:</label>
-							<input type="text" name="image_code" id="pic_code" class="msg_input">
-							<img src="../static/images/pic_code.jpg" alt="图形验证码" class="pic_code">
-							<span class="error_tip">请填写图形验证码</span>
-						</li>
+                        <li>
+                            <label>图形验证码:</label>
+                            <input type="text" name="image_code" id="pic_code" class="msg_input">
+                            <img :src="image_code_url" @click="generate_image_code" alt="图形验证码" class="pic_code">
+                            <span class="error_tip">请填写图形验证码</span>
+                        </li>
 						<li>
 							<label>短信验证码:</label>
 							<input type="text" name="sms_code" id="msg_code" class="msg_input">
@@ -87,6 +87,8 @@
 		<p>电话：010-****888    京ICP备*******8号</p>
 	</div>
     </div>
+    <script src="{{ static('js/common.js') }}"></script>
     <script src="{{ static('js/register.js') }}"></script>
+
 </body>
 </html>

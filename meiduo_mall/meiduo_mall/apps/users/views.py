@@ -5,9 +5,11 @@ import re
 from django.db import DatabaseError
 from django.urls import reverse
 from django.contrib.auth import login
-from response_code import RETCODE
+
 from users.models import User
+from meiduo_mall.utils.response_code import RETCODE
 # Create your views here.
+
 
 class UsernameCountView(View):
     """判断用户名是否重复注册"""
@@ -20,21 +22,6 @@ class UsernameCountView(View):
         # 实现主体业务逻辑：使用username查询对应的记录的条数(filter返回的是满足条件的结果集)
         count = User.objects.filter(username=username).count()
         # 响应结果
-        #print(count) #测试
-        return http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'count': count})
-
-class MobileCountView(View):
-    """判断手机号是否重复注册"""
-
-    def get(self, request, mobile):
-        """
-        :param request: 请求对象
-        :param mobile: 手机号
-        :return: JSON
-        """
-
-        count = User.objects.filter(mobile=mobile).count()
-        print(count)  # 测试
         return http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'count': count})
 
 
@@ -73,13 +60,19 @@ class RegisterView(View):
         # 判断是否勾选用户协议
         if allow != 'on':
             return http.HttpResponseForbidden('请勾选用户协议')
+
+        # 保存注册数据：是注册业务的核心
+        # return render(request, 'register.html', {'register_errmsg': '注册失败'})
         try:
             user = User.objects.create_user(username=username, password=password, mobile=mobile)
         except DatabaseError:
             return render(request, 'register.html', {'register_errmsg':'注册失败'})
 
-        #状态保持
-        #login(request, user)
+        # 实现状态保持
+        login(request, user)
 
-        # 响应结果：重定向到广告首页
+        # 响应结果：重定向到首页
+        # return http.HttpResponse('注册成功，重定向到首页')
+        # return redirect('/')
+        # reverse('contents:index') == '/'
         return redirect(reverse('contents:index'))

@@ -11,6 +11,8 @@ let vm = new Vue({
         password2: '',
         mobile: '',
         allow: '',
+        image_code_url: '',
+        uuid: '',
 
         // v-show
         error_name: false,
@@ -23,7 +25,16 @@ let vm = new Vue({
         error_name_message: '',
         error_mobile_message: '',
     },
+    mounted() { // 页面加载完会被调用的
+        // 生成图形验证码
+        this.generate_image_code();
+    },
     methods: { // 定义和实现事件方法
+        // 生成图形验证码的方法：封装的思想，代码复用
+        generate_image_code() {
+            this.uuid = generateUUID();
+            this.image_code_url = '/image_codes/' + this.uuid + '/';
+        },
         // 校验用户名
         check_username() {
             // 用户名是5-20个字符，[a-zA-Z0-9_-]
@@ -38,16 +49,20 @@ let vm = new Vue({
                 this.error_name_message = '请输入5-20个字符的用户名';
                 this.error_name = true;
             }
-            if (this.error_name == false) {
+
+            // 判断用户名是否重复注册
+            if (this.error_name == false) { // 只有当用户输入的用户名满足条件时才回去判断
                 let url = '/usernames/' + this.username + '/count/';
-                axios.get(url,{
+                axios.get(url, {
                     responseType: 'json'
                 })
                     .then(response => {
                         if (response.data.count == 1) {
+                            // 用户名已存在
                             this.error_name_message = '用户名已存在';
                             this.error_name = true;
                         } else {
+                            // 用户名不存在
                             this.error_name = false;
                         }
                     })
@@ -82,25 +97,6 @@ let vm = new Vue({
                 this.error_mobile_message = '您输入的手机号格式不正确';
                 this.error_mobile = true;
             }
-
-            if (this.error_mobile == false) {
-                let url = '/mobiles/'+ this.mobile + '/count/';
-                axios.get(url, {
-                    responseType: 'json'
-                })
-                    .then(response => {
-                        if (response.data.count == 1) {
-                            this.error_mobile_message = '手机号已存在';
-                            this.error_mobile = true;
-                        } else {
-                            this.error_mobile = false;
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error.response);
-                    })
-            }
-
         },
         // 校验是否勾选协议
         check_allow() {

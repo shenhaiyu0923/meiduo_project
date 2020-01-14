@@ -50,8 +50,8 @@ INSTALLED_APPS = [
 
     # 'meiduo_mall.apps.users', # 用户模块
     'users', # 用户模块
-    'contents'#首页广告模块
-  #  'verifications'#验证码模块，因为没有生成表单，不在这里注册也行
+    'contents', # 首页广告模块
+    'verifications', # 验证码模块
 ]
 
 MIDDLEWARE = [
@@ -118,14 +118,21 @@ DATABASES = {
 CACHES = {
     "default": { # 默认
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.61.150:6379/0",
+        "LOCATION": "redis://127.0.0.1:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
     "session": { # session
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.61.150:6379/1",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "verify_code": { # 验证码
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }

@@ -1,10 +1,61 @@
-from django.shortcuts import render
+import random,logging
 from django.views import View
 from django_redis import get_redis_connection
 from django import http
 from verifications import constants
 from verifications.libs.captcha.captcha import captcha
+from meiduo_mall.utils.response_code import *
+from verifications.libs.yuntongxun.ccp_sms import CCP
 # Create your views here.
+# 创建日志输出器
+logger = logging.getLogger('django')
+class SMSCodeView(View):
+    '''短信验证码'''
+    def get(self,request,mobile):
+        '''
+        :param request:请求对象
+        :param mobile: 手机号
+        :return: JSON
+        '''
+        #接收参数
+        image_code_client = request.GET.get('image_code')
+        uuid = request.GET.get('uuid')
+
+        #校验参数
+        if not ([image_code_client,uuid]):
+            return http.HttpResponseForbidden('缺少必传参数')
+
+        #创建连接到redis的对象
+        redis_conn = get_redis_connection('verify_code')
+        # 提取图像验证码
+        image_code_server = redis_conn.get('img_%s' % uuid)
+        print(image_code_server)
+        if image_code_server is None:
+            return http.JsonResponse({'code':RETCODE.IMAGECODEERR,'errmsg':'图形验证码失效'})#返回4001
+        # 删除图形验证码,避免恶意测试
+        redis_conn.delete('img_%s' % uuid)
+        #对比图形验证码
+        image_code_server = image_code_server.decode()#将bytes转字符串,再比较
+        if image_code_server.lower()!=image_code_client.lower():#先转小写,再比较
+            return http.JsonResponse({'code':RETCODE.IMAGECODEERR,'errmsg':'输入图片验证码有误'})
+
+        #生成短信验证码:6位随机数字
+        sms_code = '%06d' % random.randint(0,999999)
+        print(sms_code)
+        #创建日志生成器
+        logger = logging.getLogger('django')
+        logger.info(sms_code) # 手动的输出日志,记录短信验证码
+
+        #保存短信验证码
+        redis_conn.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
+        a='sms_%s' % mobile
+        print(a)
+        #发送短信验证码
+        #CCP().send_template_sms(mobile,[sms_code,constants.SMS_CODE_REDIS_EXPIRES//60],constants.SEND_SMS_TEMPLATE_ID)
+
+        # 响应结果
+        return http.JsonResponse({'code':RETCODE.OK, 'errmsg': '发送短信成功'})
+
 
 
 class ImageCodeView(View):
@@ -22,9 +73,8 @@ class ImageCodeView(View):
         # 保存图形验证码
         redis_conn = get_redis_connection('verify_code')
         # redis_conn.setex('key', 'expires', 'value')
-        redis_conn.setex('img_%s' % uuid, 300, text)
         redis_conn.setex('img_%s' % uuid, constants.IMAGE_CODE_REDIS_EXPIRES, text)
-
+        print("验证码是:  "+text)
 
         # 响应图形验证码
         return http.HttpResponse(image, content_type='image/jpg')

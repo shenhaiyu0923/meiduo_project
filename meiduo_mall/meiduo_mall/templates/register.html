@@ -54,7 +54,7 @@
 						<li>
 							<label>短信验证码:</label>
 							<input type="text" name="sms_code" id="msg_code" class="msg_input">
-							<a href="javascript:;" class="get_msg_code">获取短信验证码</a>
+							<a @click="send_sms_code" class="get_msg_code">[[sms_code_tip]]</a>
 							<span class="error_tip">请填写短信验证码</span>
 						</li>
 						<li class="agreement">

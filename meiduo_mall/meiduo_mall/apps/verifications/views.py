@@ -27,9 +27,14 @@ class SMSCodeView(View):
 
         #创建连接到redis的对象
         redis_conn = get_redis_connection('verify_code')
+
+        # 判断用户是否频繁发送短信验证码
+        send_flag = redis_conn.get('send_flag_%s' % mobile)
+        if send_flag:
+            return http.JsonResponse({'code': RETCODE.THROTTLINGERR, 'errmsg': '发送短信过于频繁'})
+
         # 提取图像验证码
         image_code_server = redis_conn.get('img_%s' % uuid)
-        print(image_code_server)
         if image_code_server is None:
             return http.JsonResponse({'code':RETCODE.IMAGECODEERR,'errmsg':'图形验证码失效'})#返回4001
         # 删除图形验证码,避免恶意测试
@@ -41,15 +46,26 @@ class SMSCodeView(View):
 
         #生成短信验证码:6位随机数字
         sms_code = '%06d' % random.randint(0,999999)
-        print(sms_code)
         #创建日志生成器
         logger = logging.getLogger('django')
         logger.info(sms_code) # 手动的输出日志,记录短信验证码
+        print("短信验证码是:" + sms_code)
 
-        #保存短信验证码
-        redis_conn.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
-        a='sms_%s' % mobile
-        print(a)
+        # #保存短信验证码
+        # redis_conn.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
+        # # 重新写入send_flag
+        # redis_conn.setex('send_flag_%s' % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
+
+        # 创建redis管道
+        pl = redis_conn.pipeline()
+        # 将命令添加到队列中
+        # 保存短信验证码
+        pl.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
+        pl.setex('send_flag_%s' % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
+        # 执行
+        pl.execute()
+
+
         #发送短信验证码
         #CCP().send_template_sms(mobile,[sms_code,constants.SMS_CODE_REDIS_EXPIRES//60],constants.SEND_SMS_TEMPLATE_ID)
 
@@ -74,7 +90,7 @@ class ImageCodeView(View):
         redis_conn = get_redis_connection('verify_code')
         # redis_conn.setex('key', 'expires', 'value')
         redis_conn.setex('img_%s' % uuid, constants.IMAGE_CODE_REDIS_EXPIRES, text)
-        print("验证码是:  "+text)
+        print("图形验证码是:  "+text)
 
         # 响应图形验证码
         return http.HttpResponse(image, content_type='image/jpg')

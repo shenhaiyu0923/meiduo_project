@@ -51,12 +51,17 @@
                             <img :src="image_code_url" @click="generate_image_code" alt="图形验证码" class="pic_code">
                             <span class="error_tip" v-show="error_image_code">[[ error_image_code_message ]]</span>
                         </li>
-						<li>
-							<label>短信验证码:</label>
-							<input type="text" name="sms_code" id="msg_code" class="msg_input">
-							<a @click="send_sms_code" class="get_msg_code">[[sms_code_tip]]</a>
-							<span class="error_tip">请填写短信验证码</span>
-						</li>
+		                <li>
+                            <label>短信验证码:</label>
+                            <input type="text" v-model="sms_code" @blur="check_sms_code" name="sms_code" id="msg_code" class="msg_input">
+                            <a @click="send_sms_code" class="get_msg_code">[[ sms_code_tip ]]</a>
+                            <span class="error_tip" v-show="error_sms_code">[[ error_sms_code_message ]]</span>
+
+{#                            {{% if sms_code_errmsg %}
+                                <span class="error_tip">{{ sms_code_errmsg }}</span>
+                            {% endif %}}#}
+
+                        </li>
 						<li class="agreement">
 							<input type="checkbox" v-model="allow" @change="check_allow" name="allow" id="allow">
 							<label>同意”美多商城用户使用协议“</label>

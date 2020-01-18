@@ -16,6 +16,7 @@ let vm = new Vue({
         image_code:'',
         sms_code_tip:'获取短信验证码',
         send_flag:false,//send_flag就是锁,false表示门开,true表示门关
+        sms_code:'',
 
 
         // v-show
@@ -25,6 +26,7 @@ let vm = new Vue({
         error_mobile: false,
         error_allow: false,
         error_image_code:false,
+        error_sms_code: false,
 
         // error_message
         error_name_message: '',
@@ -47,28 +49,29 @@ let vm = new Vue({
 
             //校验数据:mobile,image_code
             this.check_mobile();
-            this.check_image_code()
+            this.check_image_code();
             if (this.error_mobile == true || this.error_image_code == true){
                 this.send_flag = false;
                 return;
             }
+
             let url = '/sms_codes/' + this.mobile + '/?image_code=' + this.image_code + '&uuid=' + this.uuid;
             axios.get(url,{
                 responseType: 'json'
             })
                 .then(response=>{
                     if (response.data.code == '0'){
-                    //展示倒计时30秒效果
+                    //展示倒计时60秒效果
                         let num=60;
                         let t= setInterval(()=>{
-                            if (num == 1){//倒计时结束
-                                clearInterval(t);
-                                this.sms_code_tip='获取短信验证码'
+                            if (num == 1){// 倒计时即将结束
+                                clearInterval(t);// 停止回调函数的执行
+                                 this.sms_code_tip = '获取短信验证码'; // 还原sms_code_tip的提示文字
                                 this.generate_image_code();//重新生成图形验证码
                                 this.send_flag=false;
                             }else {//正在倒计时
-                                num -=1;
-                                this.sms_code_tip = num +'秒'
+                                 num -= 1; // num = num - 1;
+                                this.sms_code_tip = num +'秒';
                             }
                         },1000)
                     }else {
@@ -155,6 +158,7 @@ let vm = new Vue({
                 this.error_mobile = true;
             }
         },
+
         //校验图片验证码
         check_image_code(){
           if (this.image_code.length !=4){
@@ -167,8 +171,8 @@ let vm = new Vue({
         // 校验短信验证码
         check_sms_code(){
             if(this.sms_code.length !=6){
-              this.error_sms_code_message='请填写手机验证码';
-              this.error_sms_code = false;
+              this.error_sms_code_message='请填写短信验证码';
+              this.error_sms_code = true;
             }  else{
               this.error_sms_code = false;
             }

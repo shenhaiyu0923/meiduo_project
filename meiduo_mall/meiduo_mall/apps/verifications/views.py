@@ -2,10 +2,10 @@ import random,logging
 from django.views import View
 from django_redis import get_redis_connection
 from django import http
-from verifications import constants
+from celery_tasks.sms import constants
 from verifications.libs.captcha.captcha import captcha
 from meiduo_mall.utils.response_code import *
-from verifications.libs.yuntongxun.ccp_sms import CCP
+from celery_tasks.sms.tasks import send_sms_code
 # Create your views here.
 # 创建日志输出器
 logger = logging.getLogger('django')
@@ -49,7 +49,6 @@ class SMSCodeView(View):
         #创建日志生成器
         logger = logging.getLogger('django')
         logger.info(sms_code) # 手动的输出日志,记录短信验证码
-        print("短信验证码是:" + sms_code)
 
         # #保存短信验证码
         # redis_conn.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
@@ -60,7 +59,7 @@ class SMSCodeView(View):
         pl = redis_conn.pipeline()
         # 将命令添加到队列中
         # 保存短信验证码
-        pl.setex('sms_%s' % mobile,constants.SMS_CODE_REDIS_EXPIRES,sms_code)
+        pl.setex('sms_%s' % mobile, constants.SMS_CODE_REDIS_EXPIRES, sms_code)
         pl.setex('send_flag_%s' % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
         # 执行
         pl.execute()
@@ -68,6 +67,7 @@ class SMSCodeView(View):
 
         #发送短信验证码
         #CCP().send_template_sms(mobile,[sms_code,constants.SMS_CODE_REDIS_EXPIRES//60],constants.SEND_SMS_TEMPLATE_ID)
+        send_sms_code.delay(mobile, sms_code)  # 千万不要忘记写delay
 
         # 响应结果
         return http.JsonResponse({'code':RETCODE.OK, 'errmsg': '发送短信成功'})

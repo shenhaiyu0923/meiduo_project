@@ -97,17 +97,25 @@ let vm = new Vue({
         },
         // 校验用户名
         check_username() {
-            // 用户名是5-20个字符，[a-zA-Z0-9_-]
-            // 定义正则
-            let re = /^[a-zA-Z0-9_-]{5,20}$/;
-            // 使用正则匹配用户名数据
-            if (re.test(this.username)) {
+            let res = /^\d{1,90}$/;
+            if (res.test(this.username)) {
                 // 匹配成功，不展示错误提示信息
-                this.error_name = false;
-            } else {
-                // 匹配失败，展示错误提示信息
-                this.error_name_message = '请输入5-20个字符的用户名';
+                this.error_name_message = '用户名不能是纯数字';
                 this.error_name = true;
+
+            }else {
+                // 用户名是5-20个字符，[a-zA-Z0-9_-]
+                // 定义正则
+                let re = /^[a-zA-Z0-9_-]{5,20}$/;
+                // 使用正则匹配用户名数据
+                if (re.test(this.username)) {
+                    // 匹配成功，不展示错误提示信息
+                    this.error_name = false;
+                } else {
+                    // 匹配失败，展示错误提示信息
+                    this.error_name_message = '请输入5-20个字符的用户名';
+                    this.error_name = true;
+                }
             }
 
             // 判断用户名是否重复注册

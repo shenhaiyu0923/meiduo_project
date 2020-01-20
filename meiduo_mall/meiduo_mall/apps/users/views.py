@@ -111,6 +111,8 @@ class RegisterView(View):
         # 判断用户名是否是5-20个字符
         if not re.match(r'^[a-zA-Z0-9_-]{5,20}$', username):
             return http.HttpResponseForbidden('请输入5-20个字符的用户名')
+        if not re.match(r'^[0-9]\d{1,20}$', username):
+            return http.HttpResponseForbidden('密码不能是纯数字')
         # 判断密码是否是8-20个数字
         if not re.match(r'^[0-9A-Za-z]{8,20}$', password):
             return http.HttpResponseForbidden('请输入8-20位的密码')

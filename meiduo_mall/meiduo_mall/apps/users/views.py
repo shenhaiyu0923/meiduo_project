@@ -57,9 +57,14 @@ class LoginView(View):
             # 记住登录：状态保持周期为两周:默认是两周
             request.session.set_expiry(None)
 
-        # 响应结果:重定向到首页
-        return redirect(reverse('contents:index'))
+        response = redirect(reverse('contents:index'))
 
+        #为了实现右上角显示用户名。需要将用户名写进cookie中
+        #response.set-cookie('key',value,'expiry')
+        response.set_cookie('username',user.username,max_age=3600 * 24 * 15)#缓存15天
+
+        # 响应结果:重定向到首页
+        return response
 
 class MobileCountView(View):
     """判断手机号是否重复注册"""

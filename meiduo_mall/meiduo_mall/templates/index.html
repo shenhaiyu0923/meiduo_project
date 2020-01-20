@@ -11,16 +11,17 @@
 </head>
 <body>
 	<div id="app">
-	<div class="header_con">
+{#v-cloak等页面渲染完再进行加载#}
+	<div class="header_con" v-cloak>
 		<div class="header">
 			<div class="welcome fl">欢迎来到美多商城!</div>
 			<div class="fr">
-				<div class="login_btn fl">
-                    欢迎您：<em>传智播客</em>
-                    <span>|</span>
+
+                <div v-if="username" class="login_btn fl">
+                    欢迎您: <em>[[username]]</em>
                     <a href="#">退出</a>
                 </div>
-				<div class="login_btn fl">
+				<div v-else class="login_btn fl">
 					<a href="login.html">登录</a>
 					<span>|</span>
 					<a href="register.html">注册</a>

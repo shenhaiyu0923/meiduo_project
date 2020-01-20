@@ -118,6 +118,7 @@ let vm = new Vue({
                 })
                     .then(response => {
                         if (response.data.count == 1) {
+                            //console.debug(1)
                             // 用户名已存在
                             this.error_name_message = '用户名已存在';
                             this.error_name = true;
@@ -156,6 +157,24 @@ let vm = new Vue({
             } else {
                 this.error_mobile_message = '您输入的手机号格式不正确';
                 this.error_mobile = true;
+            }
+                       // 判断手机号是否重复注册
+            if (this.error_mobile == false) {
+                let url = '/mobiles/'+ this.mobile + '/count/';
+                axios.get(url, {
+                    responseType: 'json'
+                })
+                    .then(response => {
+                        if (response.data.count == 1) {
+                            this.error_mobile_message = '手机号已存在';
+                            this.error_mobile = true;
+                        } else {
+                            this.error_mobile = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                    })
             }
         },
 

@@ -4,11 +4,73 @@ from django import http
 import re
 from django.db import DatabaseError
 from django.urls import reverse
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django_redis import get_redis_connection
 from users.models import User
 from meiduo_mall.utils.response_code import RETCODE
 # Create your views here.
+
+
+class LoginView(View):
+    '''用户名登陆'''
+    def get(self,request):
+        '''
+        提供登陆页面
+        :param request:请求对象
+        :return: 登陆页面
+        '''
+        return render(request,'login.html')
+    def post(self,request):
+        '''
+        实现登陆逻辑
+        :param request: 请求对象
+        :return: 登陆结果
+        '''
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        remembered = request.POST.get('remembered')
+        '''校验参数'''
+        #判断参数是否齐全
+        if not all([username,password]):
+            return http.HttpResponseForbidden('缺少必填参数')
+
+        #判断用户名是否是5-20个字符
+        if not re.match(r'^[a-zA-Z0-9_-]{5,20}$',username):
+            return http.HttpResponseForbidden('请输入正确的用户名或手机号')
+
+        #判断密码是否是8-20位数字
+        if not re.match(r'^[0-9A-Za-z]{8,20}$', password):
+            return http.HttpResponseForbidden('密码最少8位，最长20位')
+
+        #认证用户登陆
+        user = authenticate(username=username,password=password)
+        if user is None:
+            return render(request,'login.html',{'account_errmsg':'用户名或密码错误'})
+
+        # 状态保持
+        login(request, user)
+        # 使用remembered确定状态保持周期（实现记住登录）
+        if remembered != 'on':
+            # 没有记住登录：状态保持在浏览器会话结束后就销毁
+            request.session.set_expiry(0) # 单位是秒
+        else:
+            # 记住登录：状态保持周期为两周:默认是两周
+            request.session.set_expiry(None)
+
+        # 响应结果:重定向到首页
+        return redirect(reverse('contents:index'))
+
+
+class MobileCountView(View):
+    """判断手机号是否重复注册"""
+
+    def get(self, request, mobile):
+        """
+        :param mobile: 手机号
+        :return: JSON
+        """
+        count = User.objects.filter(mobile=mobile).count()
+        return http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK', 'count': count})
 
 
 class UsernameCountView(View):

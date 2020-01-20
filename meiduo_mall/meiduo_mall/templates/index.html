@@ -19,7 +19,7 @@
 
                 <div v-if="username" class="login_btn fl">
                     欢迎您: <em>[[username]]</em>
-                    <a href="#">退出</a>
+                    <a href="{{ url('users:logout') }}" class="quit">退出</a>
                 </div>
 				<div v-else class="login_btn fl">
 					<a href="login.html">登录</a>

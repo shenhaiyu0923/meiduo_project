@@ -4,11 +4,21 @@ from django import http
 import re
 from django.db import DatabaseError
 from django.urls import reverse
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django_redis import get_redis_connection
 from users.models import User
 from meiduo_mall.utils.response_code import RETCODE
 # Create your views here.
+
+#退出登陆
+class LogoutView(View):
+    '''实现退出登陆'''
+    def get(self,request):
+        #清除session
+        logout(request)
+        response = redirect(reverse('contents:index'))
+        response.delete_cookie('username')
+        return response
 
 
 class LoginView(View):

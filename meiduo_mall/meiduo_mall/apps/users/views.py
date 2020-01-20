@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views import View
 from django import http
@@ -11,10 +12,24 @@ from meiduo_mall.utils.response_code import RETCODE
 # Create your views here.
 
 
-class UserInfoView(View):
+# class UserInfoView(View):
+#     '''用户中心'''
+#     def get(self,request):
+#         '''提供用户中心页面'''
+#         if request.user.is_authenticated:#django 自带判断用户是否登陆方法
+#             return render(request,'user_center_info.html')
+#         else:
+#             return redirect(reverse('users:login'))
+
+
+class UserInfoView(LoginRequiredMixin,View):
     '''用户中心'''
     def get(self,request):
         '''提供用户中心页面'''
+        # if request.user.is_authenticated:#django 自带判断用户是否登陆方法
+        #     return render(request,'user_center_info.html')
+        # else:
+        #     return redirect(reverse('users:login'))
         return render(request,'user_center_info.html')
 
 #退出登陆
@@ -75,6 +90,15 @@ class LoginView(View):
             request.session.set_expiry(None)
 
         response = redirect(reverse('contents:index'))
+
+        #响应结果
+        #先取出next
+        next = request.GET.get('next')
+        if next:
+            #重定向到next
+            response=redirect(next)
+        else:
+            response=redirect(reverse('index'))
 
         #为了实现右上角显示用户名。需要将用户名写进cookie中
         #response.set-cookie('key',value,'expiry')

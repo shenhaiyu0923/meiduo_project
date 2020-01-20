@@ -10,6 +10,13 @@ from users.models import User
 from meiduo_mall.utils.response_code import RETCODE
 # Create your views here.
 
+
+class UserInfoView(View):
+    '''用户中心'''
+    def get(self,request):
+        '''提供用户中心页面'''
+        return render(request,'user_center_info.html')
+
 #退出登陆
 class LogoutView(View):
     '''实现退出登陆'''

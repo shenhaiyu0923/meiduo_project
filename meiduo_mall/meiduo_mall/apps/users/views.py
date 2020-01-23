@@ -98,8 +98,7 @@ class LoginView(View):
             #重定向到next
             response=redirect(next)
         else:
-            response=redirect(reverse('index'))
-
+            response = redirect(reverse('contents:index'))
         #为了实现右上角显示用户名。需要将用户名写进cookie中
         #response.set-cookie('key',value,'expiry')
         response.set_cookie('username',user.username,max_age=3600 * 24 * 15)#缓存15天

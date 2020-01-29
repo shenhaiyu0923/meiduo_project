@@ -64,8 +64,8 @@
             <div class="info_con clearfix">
                 <h3 class="common_title2">基本信息</h3>
                 <ul class="user_info_list">
-                    <li><span>用户名：</span>传智播客</li>
-                    <li><span>联系方式：</span>18500001111</li>
+                    <li><span>用户名：</span>[[username]]</li>
+                    <li><span>联系方式：</span>[[mobile]]</li>
                     <li>
                         <span>Email：</span>
                         <div v-if="set_email">
@@ -153,10 +153,10 @@
 	</div>
 	</div>
     <script type="text/javascript">
-        let username = "";
-        let mobile = "";
-        let email = "";
-        let email_active = "";
+        let username = "{{ username }}";
+        let mobile = "{{ mobile }}";
+        let email = "{{ email }}";
+        let email_active = "{{ email_active }}";
     </script>
     <script type="text/javascript" src="{{ static('js/common.js') }}"></script>
     <script type="text/javascript" src="{{ static('js/user_center_info.js') }}"></script>

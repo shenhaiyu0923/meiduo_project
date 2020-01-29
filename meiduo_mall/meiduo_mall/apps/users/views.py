@@ -2,14 +2,51 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views import View
 from django import http
-import re
+import re,json,logging
 from django.db import DatabaseError
 from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout
 from django_redis import get_redis_connection
 from users.models import User
+from meiduo_mall.utils.views import LoginRequiredJSONMixin
 from meiduo_mall.utils.response_code import RETCODE
+from celery_tasks.email.tasks import send_verify_email
+from users.utils import generate_verify_email_url
 # Create your views here.
+
+logger=logging.getLogger('django')
+
+class EmailView(LoginRequiredJSONMixin,View):
+    '''添加邮箱'''
+    def put(self,request):
+        #bodu是bytes类型，要转成字符串
+        json_str = request.body.decode()
+        json_dict=json.loads(json_str)#将json转换成字符串
+        email = json_dict.get('email')
+
+        # 校验参数
+        if not email:
+            return http.HttpResponseForbidden('缺少email参数')
+        if not re.match(r'^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
+            return http.HttpResponseForbidden('参数email有误')
+
+        try:
+            #将用户传入的邮箱保存到用户数据库的email字段中
+            request.user.email=email
+            request.user.save()
+        except Exception as e:
+            logger.error(e)
+            return http.JsonResponse({'code':RETCODE.DBERR,'errmsg':'添加邮箱失败'})
+
+        #发送邮箱验证
+        verify_url = generate_verify_email_url(request.user)
+        print(verify_url)
+        send_verify_email.delay(email,verify_url)
+
+        #响应结果
+        return http.JsonResponse({'code':RETCODE.OK,'errmsg':'OK'})
+
+
 
 
 # class UserInfoView(View):
@@ -22,15 +59,25 @@ from meiduo_mall.utils.response_code import RETCODE
 #             return redirect(reverse('users:login'))
 
 
-class UserInfoView(LoginRequiredMixin,View):
+
+
+class UserInfoView(LoginRequiredMixin, View):
     '''用户中心'''
-    def get(self,request):
+
+    def get(self, request):
+        '''提供个人信息页面'''
         '''提供用户中心页面'''
         # if request.user.is_authenticated:#django 自带判断用户是否登陆方法
         #     return render(request,'user_center_info.html')
         # else:
         #     return redirect(reverse('users:login'))
-        return render(request,'user_center_info.html')
+        context = {
+            'username': request.user.username,
+            'mobile': request.user.mobile,
+            'email': request.user.email,
+            'email_active': request.user.email_active
+        }
+        return render(request, 'user_center_info.html', context=context)
 
 #退出登陆
 class LogoutView(View):

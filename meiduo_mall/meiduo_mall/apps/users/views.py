@@ -11,10 +11,37 @@ from users.models import User
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
 from meiduo_mall.utils.response_code import RETCODE
 from celery_tasks.email.tasks import send_verify_email
-from users.utils import generate_verify_email_url
+from users.utils import generate_verify_email_url,check_verify_email_token
 # Create your views here.
 
 logger=logging.getLogger('django')
+
+class AddressView(LoginRequiredMixin,View):
+    '''用户收获地址'''
+    def get(self,request):
+        return render(request,'user_center_site.html')
+
+class VerifyEmailView(View):
+    '''验证邮箱'''
+    def get(self,request):
+        #接收参数
+        token = request.GET.get('token')
+        #校验参数
+        if not token:
+            return http.HttpResponseForbidden('缺少必填参数')
+        #从token中提取用户信息user_id ==> user
+        user = check_verify_email_token(token)
+        if not user:
+            return http.HttpResponseBadRequest('无效的token')
+        try:
+            user.email_active = True
+            user.save()
+        except Exception as e:
+            logger.error(e)
+            return http.HttpResponseServerError('激活失败')
+
+        return redirect(reverse('users:info'))
+
 
 class EmailView(LoginRequiredJSONMixin,View):
     '''添加邮箱'''

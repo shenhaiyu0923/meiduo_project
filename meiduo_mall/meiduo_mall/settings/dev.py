@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'contents', # 首页广告模块
     'verifications', # 验证码模块
     'oauth',#第三方登陆
-    'areas',
+    'areas',#省市区三级联动
+    'goods'#商品模块
 ]
 
 MIDDLEWARE = [
@@ -255,3 +256,12 @@ EMAIL_FROM = '美多商城<shenhaiyu0923@yeah.net>' # 发件人抬头
 
 #邮箱激活链接
 EMAIL_VERIFY_URL = 'http://www.meiduo.site:8000/emails/verification'
+
+
+# 指定自定义的Django文件存储类
+DEFAULT_FILE_STORAGE = 'meiduo_mall.utils.fastdfs.fdfs_storage.FastDFSStorage'
+
+# FastDFS相关参数
+# FDFS_BASE_URL = 'http://192.168.103.158:8888/'
+FDFS_BASE_URL = 'http://192.168.153.135:8888/'
+

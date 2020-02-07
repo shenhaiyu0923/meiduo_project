@@ -239,7 +239,7 @@ class AddressView(LoginRequiredMixin,View):
 
         #构造上下文
         context={
-            'default_address_id': login_user.default_address_id,
+            'default_address_id': login_user.default_address_id or '0',#如果没有默认值，用0表示占位符，防止前端报错
             'addresses': address_list,
         }
 

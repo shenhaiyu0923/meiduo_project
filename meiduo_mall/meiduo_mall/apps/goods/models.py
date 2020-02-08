@@ -1,9 +1,11 @@
 from django.db import models
-from meiduo_mall.utils.models import *
+
+from meiduo_mall.utils.models import BaseModel
 # Create your models here.
+
+
 class GoodsCategory(BaseModel):
     """商品类别"""
-    objects = None
     name = models.CharField(max_length=10, verbose_name='名称')
     parent = models.ForeignKey('self', related_name='subs', null=True, blank=True, on_delete=models.CASCADE, verbose_name='父类别')
 
@@ -31,7 +33,6 @@ class GoodsChannelGroup(BaseModel):
 
 class GoodsChannel(BaseModel):
     """商品频道"""
-    objects = None
     group = models.ForeignKey(GoodsChannelGroup, verbose_name='频道组名')
     category = models.ForeignKey(GoodsCategory, on_delete=models.CASCADE, verbose_name='顶级商品类别')
     url = models.CharField(max_length=50, verbose_name='频道页面链接')
@@ -96,7 +97,7 @@ class SKU(BaseModel):
     sales = models.IntegerField(default=0, verbose_name='销量')
     comments = models.IntegerField(default=0, verbose_name='评价数')
     is_launched = models.BooleanField(default=True, verbose_name='是否上架销售')
-    default_image_url = models.CharField(max_length=200, default='', null=True, blank=True, verbose_name='默认图片')
+    default_image = models.ImageField(max_length=200, default='', null=True, blank=True, verbose_name='默认图片')
 
     class Meta:
         db_table = 'tb_sku'
@@ -162,3 +163,15 @@ class SKUSpecification(BaseModel):
 
     def __str__(self):
         return '%s: %s - %s' % (self.sku, self.spec.name, self.option.value)
+
+
+class GoodsVisitCount(BaseModel):
+    """统计分类商品访问量模型类"""
+    category = models.ForeignKey(GoodsCategory, on_delete=models.CASCADE, verbose_name='商品分类')
+    count = models.IntegerField(verbose_name='访问量', default=0)
+    date = models.DateField(auto_now_add=True, verbose_name='统计日期')
+
+    class Meta:
+        db_table = 'tb_goods_visit'
+        verbose_name = '统计分类商品访问量'
+        verbose_name_plural = verbose_name

@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'verifications', # 验证码模块
     'oauth',#第三方登陆
     'areas',#省市区三级联动
-    'goods'#商品模块
+    'goods',#商品模块
+    'carts',# 购物车模块
 ]
 
 MIDDLEWARE = [

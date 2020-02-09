@@ -17,10 +17,10 @@ class CartsView(View):
 
         # 校验参数
         #判断参数是否齐全
-        if not all(sku_id,count):
+        if not all([sku_id,count]):
             return http.HttpResponseForbidden('缺少必填参数')
         try:
-            SKU.objects.get(sku_id)
+            SKU.objects.get(id=sku_id)
         except SKU.DoesNotExist:
             return http.HttpResponseForbidden('参数sku_id错误')
         # 校验是否收是数字
@@ -34,10 +34,13 @@ class CartsView(View):
                 return http.HttpResponseForbidden('参数selected错误')
 
         # 判断用户是否登陆
-
-        # 如果用户已登陆，操作redis购物车
-
-        # 如果未登陆，操作cookie购物车
+        user = request.user
+        if user.is_authenticated:
+            # 如果用户已登陆，操作redis购物车
+            pass
+        else:
+            # 如果未登陆，操作cookie购物车
+            pass
 
         # 响应结果
         pass

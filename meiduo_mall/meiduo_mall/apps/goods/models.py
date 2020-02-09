@@ -86,6 +86,7 @@ class SPU(BaseModel):
 
 class SKU(BaseModel):
     """商品SKU"""
+    objects = None
     name = models.CharField(max_length=50, verbose_name='名称')
     caption = models.CharField(max_length=100, verbose_name='副标题')
     spu = models.ForeignKey(SPU, on_delete=models.CASCADE, verbose_name='商品')
@@ -167,6 +168,7 @@ class SKUSpecification(BaseModel):
 
 class GoodsVisitCount(BaseModel):
     """统计分类商品访问量模型类"""
+    objects = None
     category = models.ForeignKey(GoodsCategory, on_delete=models.CASCADE, verbose_name='商品分类')
     count = models.IntegerField(verbose_name='访问量', default=0)
     date = models.DateField(auto_now_add=True, verbose_name='统计日期')

@@ -73,28 +73,28 @@
 			<div class="sub_menu_con fl">
 				<h1 class="fl">商品分类</h1>
 				<ul class="sub_menu">
-                {% for group in categories.values() %}
-                <li>
-                    <div class="level1">
-                        {% for channel in group.channels %}
-                        <a href="{{ channel.url }}">{{ channel.name }}</a>
-                        {% endfor %}
-                    </div>
-                    <div class="level2">
-                        {% for cat2 in group.sub_cats %}
-                        <div class="list_group">
-                            <div class="group_name fl">{{ cat2.name }} &gt;</div>
-                            <div class="group_detail fl">
-                                {% for cat3 in cat2.sub_cats %}
-                                <a href="/list/{{ cat3.id }}/1/">{{ cat3.name }}</a>
-                                {% endfor %}
-                            </div>
+                    {% for group in categories.values() %}
+                    <li>
+                        <div class="level1">
+                            {% for channel in group.channels %}
+                            <a href="{{ channel.url }}">{{ channel.name }}</a>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+                        <div class="level2">
+                            {% for cat2 in group.sub_cats %}
+                            <div class="list_group">
+                                <div class="group_name fl">{{ cat2.name }} &gt;</div>
+                                <div class="group_detail fl">
+                                    {% for cat3 in cat2.sub_cats %}
+                                    <a href="/list/{{ cat3.id }}/1/">{{ cat3.name }}</a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
 			</div>
 			<ul class="navlist fl">
 				<li><a href="">首页</a></li>
@@ -106,7 +106,7 @@
 		</div>
 	</div>
 	<div class="breadcrumb">
-		<a href="http://shouji.jd.com/">{{ breadcrumb.cat1.name }}</a>
+		<a href="javascript:;">{{ breadcrumb.cat1.name }}</a>
 		<span>></span>
 		<a href="javascript:;">{{ breadcrumb.cat2.name }}</a>
         <span>></span>
@@ -116,7 +116,7 @@
 		<div class="l_wrap fl clearfix">
 			<div class="new_goods">
 				<h3>热销排行</h3>
-                <ul>
+				<ul>
                     <li v-for="sku in hot_skus">
                         <a :href="sku.url"><img :src="sku.default_image_url"></a>
                         <h4><a :href="sku.url">[[ sku.name ]]</a></h4>
@@ -127,16 +127,18 @@
 		</div>
 		<div class="r_wrap fr clearfix">
 			<div class="sort_bar">
-				<a href="{{ url('goods:list',args=(category_id,1)) }}?sort=default" {% if sort=='default' %}class="active"{% endif %} >默认</a>
-				<a href="{{ url('goods:list',args=(category_id,1)) }}?sort=price" {% if sort=='price' %}class="active"{% endif %} >价格</a>
-				<a href="{{ url('goods:list',args=(category_id,1)) }}?sort=hot" {% if sort=='hot' %}class="active"{% endif %} >人气</a>
+                <a href="{{ url('goods:list', args=(category_id, 1)) }}?sort=default" {% if sort=='default' %}class="active"{% endif %}>默认</a>
+                <a href="{{ url('goods:list', args=(category_id, 1)) }}?sort=price" {% if sort=='price' %}class="active"{% endif %}>价格</a>
+                <a href="{{ url('goods:list', args=(category_id, 1)) }}?sort=hot" {% if sort=='hot' %}class="active"{% endif %}>人气</a>
+{#				<a href="/list/115/1/?sort=default" class="active">默认</a>#}
+{#				<a href="/list/115/1/?sort=price">价格</a>#}
+{#				<a href="/list/115/1/?sort=hot">人气</a>#}
 			</div>
 			<ul class="goods_type_list clearfix">
                 {% for sku in page_skus %}
                     <li>
-{#                        <a href="detail.html"><img src="{{sku.default_image.url}}"></a>#}
-                        <a href="detail.html"><img src="{{sku.default_image.url}}"></a>
-                        <h4><a href="detail.html">{{ sku.name }}</a></h4>
+                        <a href="{{ url('goods:detail',args=(sku.id,)) }}"><img src="{{ sku.default_image.url }}"></a>
+                        <h4><a href="{{ url('goods:detail',args=(sku.id,)) }}">{{ sku.name }}</a></h4>
                         <div class="operate">
                             <span class="price">￥{{ sku.price }}</span>
                             <span class="unit">台</span>

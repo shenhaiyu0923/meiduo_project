@@ -21,7 +21,7 @@ let vm = new Vue({
         this.set_email = (this.email=='') ? true : false;
 
         // 请求浏览历史记录
-        // this.browse_histories();
+        this.browse_histories();
     },
     methods: {
         // 检查email格式

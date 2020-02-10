@@ -95,3 +95,15 @@ class CartsView(View):
 
             # 响应结果
             return response
+
+    def get(self,request):
+        '''查询购物车'''
+        # 判断用户是否登陆
+        user = request.user
+        if user.is_authenticated:
+            #已登陆，查询redis购物车
+            pass
+        else:
+            # 未登陆，查询cookie购物车
+            pass
+        return render(request,'cart.html')

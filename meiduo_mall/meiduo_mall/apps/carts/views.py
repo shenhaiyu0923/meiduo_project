@@ -1,3 +1,6 @@
+import base64
+import pickle
+
 from django.shortcuts import render
 from django import http
 from django.views import View
@@ -55,8 +58,40 @@ class CartsView(View):
             return http.JsonResponse({'code':RETCODE.OK,'errmsg':'OK'})
             pass
         else:
-            # 如果未登陆，操作cookie购物车
-            pass
+            # 如果用户未登录，操作cookie购物车
+            # 获取cookie中的购物车数据，并且判断是否有购物车数据
+            cart_str = request.COOKIES.get('carts')
+            if cart_str:
+                # 将 cart_str转成bytes类型的字符串
+                cart_str_bytes = cart_str.encode()
+                # 将cart_str_bytes转成bytes类型的字典
+                cart_dict_bytes = base64.b64decode(cart_str_bytes)
+                # 将cart_dict_bytes转成真正的字典
+                cart_dict = pickle.loads(cart_dict_bytes)
+            else:
+                cart_dict = {}
 
-        # 响应结果
-        pass
+            # 判断当前要添加的商品在cart_dict中是否存在
+            if sku_id in cart_dict:
+                # 购物车已存在，增量计算
+                origin_count = cart_dict[sku_id]['count']
+                count += origin_count
+
+            cart_dict[sku_id] = {
+                'count': count,
+                'selected': selected
+            }
+
+            # 将cart_dict转成bytes类型的字典
+            cart_dict_bytes = pickle.dumps(cart_dict)
+            # 将cart_dict_bytes转成bytes类型的字符串
+            cart_str_bytes = base64.b64encode(cart_dict_bytes)
+            # 将cart_str_bytes转成字符串
+            cookie_cart_str = cart_str_bytes.decode()
+
+            # 将新的购物车数据写入到cookie
+            response = http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK'})
+            response.set_cookie('carts', cookie_cart_str)
+
+            # 响应结果
+            return response

@@ -11,6 +11,75 @@ import json
 # Create your views here.
 from meiduo_mall.utils.response_code import RETCODE
 
+class CartsSelectAllView(View):
+    """全选购物车"""
+
+    def put(self, request):
+        # 接收参数
+        json_dict = json.loads(request.body.decode())
+        selected = json_dict.get('selected', True)
+
+        # 校验参数
+        if selected:
+            if not isinstance(selected, bool):
+                return http.HttpResponseForbidden('参数selected有误')
+
+        # 判断用户是否登录
+        user = request.user
+        if user.is_authenticated:
+            # 用户已登录，操作redis购物车
+            redis_conn = get_redis_connection('carts')
+
+            # 获取所有的记录 {b'3': b'1', b'5': b'2'}
+            redis_cart = redis_conn.hgetall('carts_%s' % user.id)
+            # 获取字典中所有的key [b'3', b'5']
+            redis_sku_ids = redis_cart.keys()
+            # 判断用户是否全选
+            if selected:
+                # 全选
+                redis_conn.sadd('selected_%s' % user.id, *redis_sku_ids) # *redis_sku_ids  可以直接操作一个集合
+
+            else:
+                #取消全选
+                redis_conn.srem('selected_%s' % user.id, *redis_sku_ids)
+
+            # 响应结果
+            return http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK'})
+
+        else:
+            # 用户未登陆，操作cookie购物车
+            # 获取cookie中的购物车数据，并判断是否有购物车数据
+            cart_str= request.COOKIES.get('carts')
+
+            # 构造响应对象
+            response = http.JsonResponse({'code': RETCODE.OK, 'errmsg': 'OK'})
+
+            if cart_str:
+                # 将cart_set转换成bytes类型的字符串
+                cart_str_bytes = cart_str.encode()
+                # 将cart_str_bytes转换成bytes类型的字典
+                cart_dict_bytes = base64.b64decode(cart_str_bytes)
+                # 将cart_dict_bytes转成真正的字典
+                cart_dict = pickle.loads(cart_dict_bytes)
+
+                # 遍历所有的购物车记录
+                for sku_id in cart_dict:
+                    cart_dict[sku_id]['selected'] = selected # ture or false
+
+                # 将cart_dict转成bytes类型的字典
+                cart_dict_bytes = pickle.dumps(cart_dict)
+                # 将cart_dict_bytes转成bytes类型的字符串
+                cart_str_bytes = base64.b64encode(cart_dict_bytes)
+                # 将cart_str_bytes转成字符串
+                cookie_cart_str = cart_str_bytes.decode()
+
+                # 重写将购物车数据写入到cookie
+                response.set_cookie('carts', cookie_cart_str)
+
+            return response
+
+
+
 
 class CartsView(View):
     '''购物车管理'''

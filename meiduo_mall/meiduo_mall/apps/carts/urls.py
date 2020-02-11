@@ -7,5 +7,5 @@ urlpatterns = [
     # 购物车管理
     url(r'^carts/$', views.CartsView.as_view(), name='info'),
     # 全选gwc
-    #url(r'carts/selection/', views.CartsSelectAllView.as_view()),
+    url(r'carts/selection/', views.CartsSelectAllView.as_view()),
 ]

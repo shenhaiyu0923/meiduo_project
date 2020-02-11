@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout
 from django_redis import get_redis_connection
 
+from carts.utils import merge_carts_cookies_redis
 from goods.models import SKU
 from users.models import User, Address
 from meiduo_mall.utils.views import LoginRequiredJSONMixin
@@ -457,6 +458,9 @@ class LoginView(View):
         #response.set-cookie('key',value,'expiry')
         response.set_cookie('username',user.username,max_age=3600 * 24 * 15)#缓存15天
 
+
+        # 用户登录成功，合并cookie购物车到redis购物车
+        response = merge_carts_cookies_redis(request=request, user=user, response=response)
         # 响应结果:重定向到首页
         return response
 

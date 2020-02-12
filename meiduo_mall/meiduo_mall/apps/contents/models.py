@@ -1,9 +1,11 @@
 from django.db import models
 from meiduo_mall.utils.models import *
 # Create your models here.
+from meiduo_mall.utils.models import BaseModel
+
+
 class ContentCategory(BaseModel):
     """广告内容类别"""
-    objects = None
     name = models.CharField(max_length=50, verbose_name='名称')
     key = models.CharField(max_length=50, verbose_name='类别键名')
 

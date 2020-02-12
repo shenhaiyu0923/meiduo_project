@@ -4,7 +4,6 @@ from django.db import models
 
 class Area(models.Model):
     """省市区"""
-    objects = None
     name = models.CharField(max_length=20, verbose_name='名称')
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, related_name='subs', null=True, blank=True, verbose_name='上级行政区划')
 

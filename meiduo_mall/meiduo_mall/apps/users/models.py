@@ -22,7 +22,6 @@ class User(AbstractUser):
 
 class Address(BaseModel):
     """用户地址"""
-    objects = None
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses', verbose_name='用户')
     title = models.CharField(max_length=20, verbose_name='地址名称')
     receiver = models.CharField(max_length=20, verbose_name='收货人')

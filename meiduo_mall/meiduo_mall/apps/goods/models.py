@@ -175,3 +175,4 @@ class GoodsVisitCount(BaseModel):
         db_table = 'tb_goods_visit'
         verbose_name = '统计分类商品访问量'
         verbose_name_plural = verbose_name
+

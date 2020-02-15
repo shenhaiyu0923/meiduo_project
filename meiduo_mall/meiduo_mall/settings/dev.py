@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'goods',#商品模块
     'carts',# 购物车模块
     'orders', # 订单
+    'payment',#支付
 ]
 
 MIDDLEWARE = [
@@ -300,3 +301,23 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # haystack分页时每页记录条数
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
+
+# 支付宝
+ALIPAY_APPID = '2016101800715155'
+ALIPAY_DEBUG = True
+ALIPAY_URL = 'https://openapi.alipaydev.com/gateway.do'
+ALIPAY_RETURN_URL = 'http://www.meiduo.site:8000/payment/status/'
+# 支付宝
+
+
+# 定时器配置
+CRONJOBS = [
+    # 每1分钟生成一次首页静态文件
+    ('*/1 * * * *', 'contents.crons.generate_static_index_html', '>> ' + os.path.join(os.path.dirname(BASE_DIR), 'logs/crontab.log'))
+]
+
+# 指定中文编码格式
+CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
+
+# MySQL读写分离路由
+#DATABASE_ROUTERS = ['meiduo_mall.utils.db_router.MasterSlaveDBRouter']

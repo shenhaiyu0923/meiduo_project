@@ -8,6 +8,7 @@ from goods.models import SKU
 
 class OrderInfo(BaseModel):
     """订单信息: 一"""
+    objects = None
     PAY_METHODS_ENUM = {
         "CASH": 1,
         "ALIPAY": 2

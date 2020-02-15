@@ -115,4 +115,4 @@ class PaymentStatusView(LoginRequiredJSONMixin, View):
             return http.HttpResponseForbidden('非法请求')
 
         # https://excashier.alipaydev.com/standard/auth.htm?payOrderld=13421432134134132423
-        20200215153811000000070
+        # 20200215153811000000070

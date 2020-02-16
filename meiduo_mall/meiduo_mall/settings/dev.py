@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'haystack', # 全文检索
+    'django_crontab', # 定时任务
 
     # 'meiduo_mall.apps.users', # 用户模块
     'users', # 用户模块
@@ -124,6 +125,16 @@ DATABASES = {
         'NAME': 'meiduo' # 数据库名字
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql', # 数据库引擎
+#         'HOST': '192.168.153.136', # 数据库主机
+#         'PORT': 3306, # 数据库端口
+#         'USER': 'root', # 数据库用户名
+#         'PASSWORD': '123456', # 数据库用户密码
+#         'NAME': 'meiduo' # 数据库名字
+#     }
+# }
 
 # 配置Redis数据库
 CACHES = {

@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'carts',# 购物车模块
     'orders', # 订单
     'payment',#支付
+    'meiduo_admin',#后台自应用
 ]
 
 MIDDLEWARE = [
